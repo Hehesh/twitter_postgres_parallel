@@ -1,18 +1,40 @@
-#!/bin/sh
+#!/bin/bash
 
-files=$(find data/*)
+set -e
+
+export PGPASSWORD=pass
+
+files=$(find data -type f -print)
 
 echo '================================================================================'
-echo 'load pg_denormalized'
+echo 'load denormalized'
 echo '================================================================================'
-# FIXME: implement this with GNU parallel
+
+time (
+    printf '%s\n' "$files" |
+        parallel --halt soon,fail=1 ./load_denormalized.sh
+)
 
 echo '================================================================================'
 echo 'load pg_normalized'
 echo '================================================================================'
-# FIXME: implement this with GNU parallel
+
+time (
+    printf '%s\n' "$files" |
+        parallel --halt soon,fail=1 \
+            python3 -u load_tweets.py \
+            --db "postgresql://postgres:pass@localhost:8310/postgres" \
+            --inputs
+)
 
 echo '================================================================================'
 echo 'load pg_normalized_batch'
 echo '================================================================================'
-# FIXME: implement this with GNU parallel
+
+time (
+    printf '%s\n' "$files" |
+        parallel --halt soon,fail=1 \
+            python3 -u load_tweets_batch.py \
+            --db "postgresql://postgres:pass@localhost:3810/postgres" \
+            --inputs
+)
