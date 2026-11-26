@@ -11,7 +11,7 @@ for problem in sql/*; do
     expected="expected/$problem_id.out"
     psql \
       --host localhost \
-      --port 1380 \
+      --port 5432 \
       --username postgres \
       --dbname postgres \
       < "$problem" > "$result"
