@@ -496,15 +496,10 @@ def _insert_tweets(connection, input_tweets):
 
             connection.execute(tweet_sql, tweet_binds)
 
-        url_ids = _get_url_ids(
-            connection,
-            normalized_urls,
-        )
-
         tweet_urls = [
             {
                 "id_tweets": row["id_tweets"],
-                "id_urls": url_ids[row["url"]],
+                "url": row["url"],
             }
             for row in tweet_url_pairs
         ]
@@ -512,7 +507,7 @@ def _insert_tweets(connection, input_tweets):
         tweet_media = [
             {
                 "id_tweets": row["id_tweets"],
-                "id_urls": url_ids[row["url"]],
+                "url": row["url"],
                 "type": row["type"],
             }
             for row in tweet_media_pairs
